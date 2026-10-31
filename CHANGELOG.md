@@ -1,3 +1,9 @@
+## [1.0.0-dev.3](https://github.com/srinath1848/nobrokerhood-patches/compare/v1.0.0-dev.2...v1.0.0-dev.3) (2026-10-31)
+
+### 🐛 Bug Fixes
+
+* remove template example patch ([f3e4d98](https://github.com/srinath1848/nobrokerhood-patches/commit/f3e4d98b5447e4415a207b81d0e51b7dfe30e36c))
+
 ## [1.0.0-dev.2](https://github.com/srinath1848/nobrokerhood-patches/compare/v1.0.0-dev.1...v1.0.0-dev.2) (2026-10-31)
 
 ### 🐛 Bug Fixes
