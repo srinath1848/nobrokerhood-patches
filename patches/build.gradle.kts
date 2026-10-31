@@ -1,21 +1,20 @@
-group = "app.template"
+
+group = "community.nobrokerhood"
 
 patches {
-    // TODO: Update this section with your project details.
     about {
-        name = "UserXYZ Patches"
-        description = "Patches for apps I like"
-        source = "git@github.com:UserXYZ/morphe-patches.git"
-        author = "Awesome dev"
+        name = "NoBrokerHood Community Patches"
+        description = "Experimental ad-removal patches for NoBrokerHood 3.6.6"
+        source = "https://github.com/srinath1848/nobrokerhood-patches"
+        author = "Community"
         contact = "na"
-        website = "na"
+        website = "https://github.com/srinath1848/nobrokerhood-patches"
         license = "GPLv3"
     }
 }
 
-// Separate configuration so gson is available at runtime for the
-// generatePatchesList task but never bundled into the APK.
-val patchListGeneratorClasspath = configurations.create("patchListGeneratorClasspath")
+val patchListGeneratorClasspath =
+    configurations.create("patchListGeneratorClasspath")
 
 dependencies {
     compileOnly(libs.gson)
@@ -25,14 +24,13 @@ dependencies {
 tasks {
     register<JavaExec>("generatePatchesList") {
         description = "Build patch with patch list"
-
         dependsOn(build)
-
-        classpath = sourceSets["main"].runtimeClasspath + patchListGeneratorClasspath
+        classpath =
+            sourceSets["main"].runtimeClasspath +
+            patchListGeneratorClasspath
         mainClass.set("util.PatchListGeneratorKt")
     }
 
-    // Used by gradle-semantic-release-plugin.
     publish {
         dependsOn("generatePatchesList")
     }
