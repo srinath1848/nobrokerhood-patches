@@ -1,7 +1,7 @@
 {
-  "created_at": "",
-  "description": "",
-  "download_url": "",
+  "created_at": "2026-10-31T17:12:15",
+  "description": "## 1.0.0-dev.1 (2026-10-31)\n\n### ✨ New Features\n\n* add NoBrokerHood ad-removal patches ([ee8ad0d](https://github.com/srinath1848/nobrokerhood-patches/commit/ee8ad0d0f14ecf394e83a18cb1ef7ba65ee112ff))",
+  "download_url": "https://github.com/srinath1848/nobrokerhood-patches/releases/download/v1.0.0-dev.1/patches-1.0.0-dev.1.mpp",
   "signature_download_url": "",
-  "version": ""
+  "version": "1.0.0-dev.1"
 }
