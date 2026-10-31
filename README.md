@@ -101,3 +101,5 @@ See the [Morphe documentation](https://github.com/MorpheApp/morphe-documentation
 ## 📜 License
 
 UserXYZ Patches are licensed under the [GNU General Public License v3.0](LICENSE)
+
+Experimental NoBrokerHood 3.6.6 ad-removal patches.
