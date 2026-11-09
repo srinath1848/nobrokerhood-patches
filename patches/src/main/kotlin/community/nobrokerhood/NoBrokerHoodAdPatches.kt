@@ -246,7 +246,7 @@ val hideExpandedNotificationImagesPatch = bytecodePatch(
             definingClass =
                 "Lcom/app/nobrokerhood/notifications/DoorFirebaseMessagingService;",
             name = "U",
-            returnType = "Landroidx/core/app/o$j;",
+            returnType = "Landroidx/core/app/o\$j;",
             parameters = listOf(
                 "Ljava/lang/String;",
                 "Ljava/lang/String;",
