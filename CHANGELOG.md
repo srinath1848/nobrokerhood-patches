@@ -1,3 +1,9 @@
+## [1.3.0](https://github.com/srinath1848/nobrokerhood-patches/compare/v1.2.0...v1.3.0) (2026-11-10)
+
+### ✨ New Features
+
+* add NoBrokerHood targeted nag and redirect patches ([1e39258](https://github.com/srinath1848/nobrokerhood-patches/commit/1e3925815d238530f02da25fa0e793ec829b5c5f))
+
 ## [1.2.0](https://github.com/srinath1848/nobrokerhood-patches/compare/v1.1.0...v1.2.0) (2026-11-10)
 
 ### ✨ New Features
