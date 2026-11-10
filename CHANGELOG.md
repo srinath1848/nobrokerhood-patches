@@ -1,3 +1,9 @@
+## [1.7.0](https://github.com/srinath1848/nobrokerhood-patches/compare/v1.6.1...v1.7.0) (2026-11-10)
+
+### ✨ New Features
+
+* guard NoBrokerHood notification click browser routes ([17d7737](https://github.com/srinath1848/nobrokerhood-patches/commit/17d7737b24ac83160760add5a3e9d00520bc1d98))
+
 ## [1.6.1](https://github.com/srinath1848/nobrokerhood-patches/compare/v1.6.0...v1.6.1) (2026-11-10)
 
 ### 🐛 Bug Fixes
