@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-10T08:07:33",
-  "description": "## [1.3.0](https://github.com/srinath1848/nobrokerhood-patches/compare/v1.2.0...v1.3.0) (2026-11-10)\n\n### ✨ New Features\n\n* add NoBrokerHood targeted nag and redirect patches ([1e39258](https://github.com/srinath1848/nobrokerhood-patches/commit/1e3925815d238530f02da25fa0e793ec829b5c5f))",
-  "download_url": "https://github.com/srinath1848/nobrokerhood-patches/releases/download/v1.3.0/patches-1.3.0.mpp",
+  "created_at": "2026-11-10T08:41:15",
+  "description": "## [1.4.0](https://github.com/srinath1848/nobrokerhood-patches/compare/v1.3.0...v1.4.0) (2026-11-10)\n\n### ✨ New Features\n\n* test NoBrokerHood floating sidebar removal ([45a1277](https://github.com/srinath1848/nobrokerhood-patches/commit/45a12771ae0045dbb630c82eaca926c2a4c4c032))",
+  "download_url": "https://github.com/srinath1848/nobrokerhood-patches/releases/download/v1.4.0/patches-1.4.0.mpp",
   "signature_download_url": "",
-  "version": "1.3.0"
+  "version": "1.4.0"
 }

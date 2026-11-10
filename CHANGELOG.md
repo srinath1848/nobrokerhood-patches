@@ -1,3 +1,9 @@
+## [1.4.0](https://github.com/srinath1848/nobrokerhood-patches/compare/v1.3.0...v1.4.0) (2026-11-10)
+
+### ✨ New Features
+
+* test NoBrokerHood floating sidebar removal ([45a1277](https://github.com/srinath1848/nobrokerhood-patches/commit/45a12771ae0045dbb630c82eaca926c2a4c4c032))
+
 ## [1.3.0](https://github.com/srinath1848/nobrokerhood-patches/compare/v1.2.0...v1.3.0) (2026-11-10)
 
 ### ✨ New Features

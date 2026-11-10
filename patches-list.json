@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "patches": [
     {
       "name": "NoBrokerHood: Default browser, block known ad hosts (experimental)",
@@ -165,33 +165,6 @@
       "options": []
     },
     {
-      "name": "NoBrokerHood: Hide home floating widget (experimental)",
-      "description": "Disable a home floating-widget visibility gate. Could hide unrelated shortcuts.",
-      "default": false,
-      "category": null,
-      "compatiblePackages": [
-        {
-          "packageName": "com.app.nobrokerhood",
-          "name": "NoBrokerHood",
-          "description": null,
-          "apkFileType": null,
-          "appIconColor": null,
-          "signatures": null,
-          "formFactor": "MOBILE",
-          "targets": [
-            {
-              "version": "3.6.11",
-              "versionCodes": null,
-              "isExperimental": false,
-              "minSdk": null,
-              "description": null
-            }
-          ]
-        }
-      ],
-      "options": []
-    },
-    {
       "name": "NoBrokerHood: Hide home-discover carousel (experimental)",
       "description": "Hide cards in the homepage discover carousel; may hide non-ad items too.",
       "default": false,
@@ -276,6 +249,33 @@
       "name": "NoBrokerHood: Hide promotional popups",
       "description": "Suppress app-level marketing dialogs (3.6.11).",
       "default": true,
+      "category": null,
+      "compatiblePackages": [
+        {
+          "packageName": "com.app.nobrokerhood",
+          "name": "NoBrokerHood",
+          "description": null,
+          "apkFileType": null,
+          "appIconColor": null,
+          "signatures": null,
+          "formFactor": "MOBILE",
+          "targets": [
+            {
+              "version": "3.6.11",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "NoBrokerHood: Hide promotional side tab (experimental)",
+      "description": "Suppress the draggable multimedia promotion card; verify on-device.",
+      "default": false,
       "category": null,
       "compatiblePackages": [
         {
