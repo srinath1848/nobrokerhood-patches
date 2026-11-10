@@ -652,3 +652,50 @@ val hideVisitorIslandPromoPatch = bytecodePatch(
         )
     }
 }
+
+/**
+ * Suppress the actual POST-APPROVAL advertising carousel, including video.
+ *
+ * The original 3.6.11 DEX has this path:
+ * DisplayEntryBannerFragment.initRecyclerView()
+ *   -> constructs BannerListAdapter (obfuscated as adapters/n0)
+ *   -> RecyclerView asks BannerListAdapter.getItemCount()
+ *   -> onBindViewHolder(...) branches on "Image", "gif", "video", "lottie".
+ *
+ * Previous getTickets()/getDefaultCard() patches did not stop a video ad
+ * because the adapter could still receive cards through the fallback path.
+ * Returning 0 prevents RecyclerView from binding/starting any ad item.
+ * It does NOT skip DisplayEntryBannerFragment.setData(), which populates
+ * visitor details and the green approval confirmation separately.
+ *
+ * Expected tradeoff: an empty ad area might remain until the user closes
+ * the approval screen. The autoplay video's completion callback will not
+ * run, so don't assume the screen will close automatically.
+ *
+ * Original method: Lcom/app/nobrokerhood/adapters/n0;->getItemCount()I
+ * Source name in DEX: BannerListAdapter.java (classes5.dex)
+ * Registers: 2 total, 1 input, v0 is a safe local register.
+ * Only observed adapter constructor caller is DisplayEntryBannerFragment.
+ */
+@Suppress("unused")
+val hidePostApprovalMultimediaCardsPatch = bytecodePatch(
+    name = "NoBrokerHood: Hide post-approval multimedia ads",
+    description = "Suppress image, GIF, video and Lottie ad cards after approval, without blocking the approval status.",
+    default = false,
+) {
+    compatibleWith(NOBROKERHOOD_3611)
+    execute {
+        Fingerprint(
+            definingClass = "Lcom/app/nobrokerhood/adapters/n0;",
+            name = "getItemCount",
+            returnType = "I",
+            parameters = emptyList(),
+        ).matchSingle().method.addInstructions(
+            0,
+            """
+            const/4 v0, 0x0
+            return v0
+            """.trimIndent(),
+        )
+    }
+}
