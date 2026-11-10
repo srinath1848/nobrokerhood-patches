@@ -19,9 +19,9 @@ Click the button below, or manually add this repo url to Morphe Manager: https:/
 ## 🩹 Patches list
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.4.0](https://github.com/srinath1848/nobrokerhood-patches/releases/tag/v1.4.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;13 patches total
+> **[v1.5.0](https://github.com/srinath1848/nobrokerhood-patches/releases/tag/v1.5.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;16 patches total
 <details open>
-<summary>📦 NoBrokerHood&nbsp;&nbsp;•&nbsp;&nbsp;13 patches</summary>
+<summary>📦 NoBrokerHood&nbsp;&nbsp;•&nbsp;&nbsp;16 patches</summary>
 <br>
 
 **Package name:** `com.app.nobrokerhood`
@@ -33,8 +33,10 @@ Click the button below, or manually add this repo url to Morphe Manager: https:/
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
+| [NoBrokerHood: Clear top billboard at state creation (test)](#nobrokerhood-clear-top-billboard-at-state-creation-test) | Replace TopAdState's list with an empty list at construction. |  |
 | [NoBrokerHood: Default browser, block known ad hosts (experimental)](#nobrokerhood-default-browser-block-known-ad-hosts-experimental) | Use Android browser for genuine links; block known Multipl redirect hosts. |  |
 | [NoBrokerHood: Hide app-bar banners (experimental)](#nobrokerhood-hide-app-bar-banners-experimental) | Empty app-bar banner entries; may leave a layout placeholder. |  |
+| [NoBrokerHood: Hide app-bar island row (test)](#nobrokerhood-hide-app-bar-island-row-test) | Skip the AppBarIsland.kt horizontal row. May hide non-ad items. |  |
 | [NoBrokerHood: Hide app-bar response cards (experimental)](#nobrokerhood-hide-app-bar-response-cards-experimental) | Remove app-bar advertising card data before creating banner state. |  |
 | [NoBrokerHood: Hide default post-approval card (experimental)](#nobrokerhood-hide-default-post-approval-card-experimental) | Hide the fallback ad card after entry approval. Null handling is untested. |  |
 | [NoBrokerHood: Hide expanded notification images (experimental)](#nobrokerhood-hide-expanded-notification-images-experimental) | Hide large banner images in entry/exit notifications while retaining text (3.6.11). |  |
@@ -44,6 +46,7 @@ Click the button below, or manually add this repo url to Morphe Manager: https:/
 | [NoBrokerHood: Hide post-approval ad card (experimental)](#nobrokerhood-hide-post-approval-ad-card-experimental) | Hide the sponsored card shown after entry approval or pre-approval (3.6.11). |  |
 | [NoBrokerHood: Hide promotional popups](#nobrokerhood-hide-promotional-popups) | Suppress app-level marketing dialogs (3.6.11). |  |
 | [NoBrokerHood: Hide promotional side tab (experimental)](#nobrokerhood-hide-promotional-side-tab-experimental) | Suppress the draggable multimedia promotion card; verify on-device. |  |
+| [NoBrokerHood: Hide real RIGHT_AD side tab (test)](#nobrokerhood-hide-real-right-ad-side-tab-test) | Skip the SideAd.kt Compose renderer attached to the RIGHT_AD home section. |  |
 | [NoBrokerHood: Hide visitor-flow ads](#nobrokerhood-hide-visitor-flow-ads) | Hide the visitor-flow promotional carousel (3.6.11). |  |
 | [NoBrokerHood: Stop full-screen permission nag](#nobrokerhood-stop-full-screen-permission-nag) | Stop the home-screen full-screen alert reminder without changing permissions. |  |
 

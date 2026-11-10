@@ -1,7 +1,34 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "patches": [
+    {
+      "name": "NoBrokerHood: Clear top billboard at state creation (test)",
+      "description": "Replace TopAdState's list with an empty list at construction.",
+      "default": false,
+      "category": null,
+      "compatiblePackages": [
+        {
+          "packageName": "com.app.nobrokerhood",
+          "name": "NoBrokerHood",
+          "description": null,
+          "apkFileType": null,
+          "appIconColor": null,
+          "signatures": null,
+          "formFactor": "MOBILE",
+          "targets": [
+            {
+              "version": "3.6.11",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
     {
       "name": "NoBrokerHood: Default browser, block known ad hosts (experimental)",
       "description": "Use Android browser for genuine links; block known Multipl redirect hosts.",
@@ -32,6 +59,33 @@
     {
       "name": "NoBrokerHood: Hide app-bar banners (experimental)",
       "description": "Empty app-bar banner entries; may leave a layout placeholder.",
+      "default": false,
+      "category": null,
+      "compatiblePackages": [
+        {
+          "packageName": "com.app.nobrokerhood",
+          "name": "NoBrokerHood",
+          "description": null,
+          "apkFileType": null,
+          "appIconColor": null,
+          "signatures": null,
+          "formFactor": "MOBILE",
+          "targets": [
+            {
+              "version": "3.6.11",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "NoBrokerHood: Hide app-bar island row (test)",
+      "description": "Skip the AppBarIsland.kt horizontal row. May hide non-ad items.",
       "default": false,
       "category": null,
       "compatiblePackages": [
@@ -275,6 +329,33 @@
     {
       "name": "NoBrokerHood: Hide promotional side tab (experimental)",
       "description": "Suppress the draggable multimedia promotion card; verify on-device.",
+      "default": false,
+      "category": null,
+      "compatiblePackages": [
+        {
+          "packageName": "com.app.nobrokerhood",
+          "name": "NoBrokerHood",
+          "description": null,
+          "apkFileType": null,
+          "appIconColor": null,
+          "signatures": null,
+          "formFactor": "MOBILE",
+          "targets": [
+            {
+              "version": "3.6.11",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "NoBrokerHood: Hide real RIGHT_AD side tab (test)",
+      "description": "Skip the SideAd.kt Compose renderer attached to the RIGHT_AD home section.",
       "default": false,
       "category": null,
       "compatiblePackages": [

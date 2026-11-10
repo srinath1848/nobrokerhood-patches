@@ -1,3 +1,9 @@
+## [1.5.0](https://github.com/srinath1848/nobrokerhood-patches/compare/v1.4.0...v1.5.0) (2026-11-10)
+
+### ✨ New Features
+
+* test accurate NoBrokerHood banner renderers ([a9bcac2](https://github.com/srinath1848/nobrokerhood-patches/commit/a9bcac227d32c364f2a6de3cec5a8bdd60e5ab4e))
+
 ## [1.4.0](https://github.com/srinath1848/nobrokerhood-patches/compare/v1.3.0...v1.4.0) (2026-11-10)
 
 ### ✨ New Features
