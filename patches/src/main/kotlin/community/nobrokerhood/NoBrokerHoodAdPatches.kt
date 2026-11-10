@@ -1,7 +1,7 @@
 package community.nobrokerhood
 
 /**
- * NoBrokerHood 3.6.11 (versionCode 712) / 17-patch candidate based on the last tested 16-patch source.
+ * NoBrokerHood 3.6.11 (versionCode 712) / 19-patch candidate retaining the earlier 18-patch source.
  *
  * - Carries forward ten v0.5 patches.
  * - Replaces the unsafe v0.6 unconditional default-browser redirect hook
@@ -377,7 +377,7 @@ val hideHomeDiscoverCarouselPatch = bytecodePatch(
 /**
  * EXPERIMENTAL (v0.7): Open ordinary links with the Android default browser,
  * but refuse to launch URLs hosted on the observed advertising redirect
- * domain (apps.multipl.in / multipl.in).
+ * domains (apps.multipl.in, multipl.in, dts.innovid.com, innovid.com).
  *
  * This deliberately replaces the v0.6 catch-all ACTION_VIEW hook, which
  * opened the promotional link when the notification was tapped.
@@ -394,7 +394,7 @@ val hideHomeDiscoverCarouselPatch = bytecodePatch(
 @Suppress("unused")
 val useDefaultBrowserInsteadOfChromePatch = bytecodePatch(
     name = "NoBrokerHood: Default browser, block known ad hosts (experimental)",
-    description = "Use Android browser for genuine links; block known Multipl redirect hosts.",
+    description = "Keep default-browser support but block known Multipl and Innovid ad-tracking hosts.",
     default = false,
 ) {
     compatibleWith(NOBROKERHOOD_3611)
@@ -417,6 +417,14 @@ val useDefaultBrowserInsteadOfChromePatch = bytecodePatch(
             move-result v0
             if-nez v0, :blocked
             const-string v0, "multipl.in"
+            invoke-virtual {v0, v2}, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
+            move-result v0
+            if-nez v0, :blocked
+            const-string v0, "dts.innovid.com"
+            invoke-virtual {v0, v2}, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
+            move-result v0
+            if-nez v0, :blocked
+            const-string v0, "innovid.com"
             invoke-virtual {v0, v2}, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
             move-result v0
             if-nez v0, :blocked
@@ -695,6 +703,96 @@ val hidePostApprovalMultimediaCardsPatch = bytecodePatch(
             """
             const/4 v0, 0x0
             return v0
+            """.trimIndent(),
+        )
+    }
+}
+
+
+/**
+ * Experimental: disarm promotional browser deeplinks carried by push
+ * notification intents BEFORE the app parses and forwards those links.
+ *
+ * Original NoBrokerHood 3.6.11 observations:
+ * - DoorFirebaseMessagingService.J constructs a DoorSplashScreen PendingIntent
+ *   with "uniqueCode", "destination_route", "messageType" and "payloadData".
+ * - DoorSplashScreen.R1 reads destination_route/deeplink and forwards the route
+ *   to HomeActivity, whose "chromeTab" route launches a URL in the browser.
+ * - Browser launch can follow a notification tap even if its content describes
+ *   a legitimate visitor entry or exit.
+ *
+ * This guard ONLY modifies an intent already marked as a notification
+ * (uniqueCode present) AND asking to open a browser route/URL.  It does not
+ * suppress the notification, alter the approval request, change Firebase
+ * registration, touch Android channels, or block manually opened URLs.
+ *
+ * It removes the external route and lets existing messageType/visitor data
+ * continue through the original routing code.  With incomplete server-side
+ * context, this may navigate to the app home screen rather than to the exact
+ * visitor detail.  Disabling is recommended if another notification category
+ * loses its legitimate external link.
+ *
+ * Method verified in original APK: DoorSplashScreen.R1()V; registers=19,
+ * inputs=1, leaves v0..v17 free locals at entry. Uses only v0..v3.
+ */
+@Suppress("unused")
+val stopNotificationPromoBrowserRedirectPatch = bytecodePatch(
+    name = "NoBrokerHood: Stop promotional browser launches from notifications",
+    description = "Prevent notification-triggered browser ad routes; retain security alerts and in-app event metadata (experimental).",
+    default = false,
+) {
+    compatibleWith(NOBROKERHOOD_3611)
+    execute {
+        Fingerprint(
+            definingClass = "Lcom/app/nobrokerhood/activities/DoorSplashScreen;",
+            name = "R1",
+            returnType = "V",
+            parameters = emptyList(),
+        ).matchSingle().method.addInstructionsWithLabels(
+            0,
+            """
+            move-object/from16 v0, p0
+            invoke-virtual {v0}, Landroid/app/Activity;->getIntent()Landroid/content/Intent;
+            move-result-object v0
+            if-eqz v0, :nbhNotificationRouteDone
+            const-string v1, "uniqueCode"
+            invoke-virtual {v0, v1}, Landroid/content/Intent;->hasExtra(Ljava/lang/String;)Z
+            move-result v1
+            if-eqz v1, :nbhNotificationRouteDone
+            const-string v1, "destination_route"
+            invoke-virtual {v0, v1}, Landroid/content/Intent;->getStringExtra(Ljava/lang/String;)Ljava/lang/String;
+            move-result-object v2
+            const-string v3, "chromeTab"
+            invoke-virtual {v3, v2}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+            move-result v3
+            if-nez v3, :nbhRemoveExternalRoute
+            const-string v1, "deeplink"
+            invoke-virtual {v0, v1}, Landroid/content/Intent;->getStringExtra(Ljava/lang/String;)Ljava/lang/String;
+            move-result-object v2
+            if-eqz v2, :nbhNotificationRouteDone
+            const-string v3, "https://"
+            invoke-virtual {v2, v3}, Ljava/lang/String;->startsWith(Ljava/lang/String;)Z
+            move-result v3
+            if-nez v3, :nbhRemoveExternalRoute
+            const-string v3, "http://"
+            invoke-virtual {v2, v3}, Ljava/lang/String;->startsWith(Ljava/lang/String;)Z
+            move-result v3
+            if-nez v3, :nbhRemoveExternalRoute
+            const-string v3, "target_url"
+            invoke-virtual {v2, v3}, Ljava/lang/String;->contains(Ljava/lang/CharSequence;)Z
+            move-result v3
+            if-eqz v3, :nbhNotificationRouteDone
+            :nbhRemoveExternalRoute
+            const-string v1, "destination_route"
+            invoke-virtual {v0, v1}, Landroid/content/Intent;->removeExtra(Ljava/lang/String;)V
+            const-string v1, "deeplink"
+            invoke-virtual {v0, v1}, Landroid/content/Intent;->removeExtra(Ljava/lang/String;)V
+            const-string v1, "url"
+            invoke-virtual {v0, v1}, Landroid/content/Intent;->removeExtra(Ljava/lang/String;)V
+            const/4 v1, 0x0
+            invoke-virtual {v0, v1}, Landroid/content/Intent;->setData(Landroid/net/Uri;)Landroid/content/Intent;
+            :nbhNotificationRouteDone
+            nop
             """.trimIndent(),
         )
     }
