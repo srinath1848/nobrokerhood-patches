@@ -1,7 +1,7 @@
 package community.nobrokerhood
 
 /**
- * NoBrokerHood 3.6.11 (versionCode 712) / next-release diagnostic candidate based on GitHub v1.4.0.
+ * NoBrokerHood 3.6.11 (versionCode 712) / 17-patch candidate based on the last tested 16-patch source.
  *
  * - Carries forward ten v0.5 patches.
  * - Replaces the unsafe v0.6 unconditional default-browser redirect hook
@@ -11,7 +11,7 @@ package community.nobrokerhood
  * - Does not rewrite push delivery, channels, approval actions, or tokens.
  * - Does not claim to selectively filter the mixed announcement carousel.
  *
- * These edits are NOT compiled or device tested in this environment.
+ * The source passes local Kotlin-stub compilation. A real Morphe build and device test are still required.
  */
 
 import app.morphe.patcher.Fingerprint
@@ -26,7 +26,7 @@ import app.morphe.patcher.util.returnEarly
 /**
  * NoBrokerHood 3.6.11 (versionCode 712) experimental community patches.
  * Fingerprints were checked against the user-supplied 3.6.11 XAPK.
- * NOT compiled or runtime-tested on a device for this revision.
+ * New island-strip filter NOT runtime-tested on a device in this revision.
  *
  * Security-sensitive limitation:
  * - No patches to Firebase token creation/registration or message delivery.
@@ -507,8 +507,8 @@ val suppressFloatingCampaignWidgetPatch = bytecodePatch(
  */
 @Suppress("unused")
 val hideComposeSideAdPatch = bytecodePatch(
-    name = "NoBrokerHood: Hide real RIGHT_AD side tab (test)",
-    description = "Skip the SideAd.kt Compose renderer attached to the RIGHT_AD home section.",
+    name = "NoBrokerHood: Hide floating promotional sidebar",
+    description = "Hide the SideAd.kt Compose renderer attached to the RIGHT_AD home section.",
     default = false,
 ) {
     compatibleWith(NOBROKERHOOD_3611)
@@ -542,8 +542,8 @@ val hideComposeSideAdPatch = bytecodePatch(
  */
 @Suppress("unused")
 val clearTopAdStateAtConstructionPatch = bytecodePatch(
-    name = "NoBrokerHood: Clear top billboard at state creation (test)",
-    description = "Replace TopAdState's list with an empty list at construction.",
+    name = "NoBrokerHood: Hide homepage billboard",
+    description = "Hide the homepage top billboard by clearing TopAdState during construction.",
     default = false,
 ) {
     compatibleWith(NOBROKERHOOD_3611)
@@ -598,5 +598,57 @@ val hideAppBarIslandHorizontalListPatch = bytecodePatch(
                 "Lkotlin/jvm/functions/Function0;", "Li3/r;", "I", "I", "I",
             ),
         ).matchSingle().method.returnEarly()
+    }
+}
+
+/**
+ * EXPERIMENTAL: Hide homepage ISLAND_BANNER items by changing ONLY their
+ * type discriminator to an unrecognised value. Unlike the older
+ * AppBarIsland horizontal-list patch, this targets the section's type at
+ * its source. Static analysis has not proven that the small Domino's bar
+ * is actually labelled ISLAND_BANNER, so this is one isolated A/B test.
+ *
+ * Original NoBrokerHood 3.6.11 code:
+ *  TopSectionItem.getType(): String
+ *     iget-object v0, p0, ...->type:Ljava/lang/String;
+ *     return-object v0
+ *
+ * Verified original: registers=2, ins=1, instructions=3 words.
+ * Injection at index 1 runs AFTER the field read and BEFORE return.
+ * The original instance register p0 is no longer needed, making it safe
+ * to use as a temporary second String/boolean register. Other types
+ * return their original value unchanged. No approval/notification logic
+ * is modified.
+ *
+ * Disable this patch immediately if any non-ad homepage section is
+ * missing; the server's actual type for the blue promo is unconfirmed.
+ */
+@Suppress("unused")
+val hideVisitorIslandPromoPatch = bytecodePatch(
+    name = "NoBrokerHood: Hide island promotional strip (experimental)",
+    description = "Hide homepage items marked ISLAND_BANNER; test against the blue Domino's strip.",
+    default = false,
+) {
+    compatibleWith(NOBROKERHOOD_3611)
+    execute {
+        Fingerprint(
+            definingClass =
+                "Lcom/app/nobrokerhood/features/homepage/data/remote/models/TopSectionItem;",
+            name = "getType",
+            returnType = "Ljava/lang/String;",
+            parameters = emptyList(),
+        ).matchSingle().method.addInstructionsWithLabels(
+            1,
+            """
+            if-eqz v0, :nbhKeepType
+            const-string p0, "ISLAND_BANNER"
+            invoke-virtual {v0, p0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+            move-result p0
+            if-eqz p0, :nbhKeepType
+            const-string v0, "NBH_HIDDEN_ISLAND_BANNER"
+            :nbhKeepType
+            nop
+            """.trimIndent(),
+        )
     }
 }
