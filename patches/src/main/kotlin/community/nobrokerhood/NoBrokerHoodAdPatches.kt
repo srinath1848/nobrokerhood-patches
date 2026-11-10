@@ -1,7 +1,7 @@
 package community.nobrokerhood
 
 /**
- * NoBrokerHood 3.6.11 (versionCode 712) / community patch source v0.8 (sidebar experiment).
+ * NoBrokerHood 3.6.11 (versionCode 712) / next-release diagnostic candidate based on GitHub v1.4.0.
  *
  * - Carries forward ten v0.5 patches.
  * - Replaces the unsafe v0.6 unconditional default-browser redirect hook
@@ -487,6 +487,115 @@ val suppressFloatingCampaignWidgetPatch = bytecodePatch(
             returnType = "V",
             parameters = listOf(
                 "Lcom/app/nobrokerhood/newnobrokerhood/promotions/data/PromotionData;",
+            ),
+        ).matchSingle().method.returnEarly()
+    }
+}
+
+/**
+ * EXPERIMENTAL: Remove the actual Compose SideAd renderer on the home screen.
+ *
+ * Static trace in the ORIGINAL 3.6.11 APK:
+ * - Lrh/r0; (NewHomeFragment.kt) -> c3(...) invokes Lsh/u0;->f(...).
+ * - Lsh/u0; is compiled from SideAd.kt, and NewHomeFragment.b3 filters
+ *   the TopSectionItem type RIGHT_AD before composing this slot.
+ *
+ * This is distinct from ya.showMultimediaCard(PromotionData), which our
+ * previous release patched and which did not remove the observed side tab.
+ * This hook changes only the drawing composable, not ad click routing or
+ * visitor, payment or notification behaviour.
+ */
+@Suppress("unused")
+val hideComposeSideAdPatch = bytecodePatch(
+    name = "NoBrokerHood: Hide real RIGHT_AD side tab (test)",
+    description = "Skip the SideAd.kt Compose renderer attached to the RIGHT_AD home section.",
+    default = false,
+) {
+    compatibleWith(NOBROKERHOOD_3611)
+    execute {
+        Fingerprint(
+            definingClass = "Lsh/u0;",
+            name = "f",
+            returnType = "V",
+            parameters = listOf(
+                "Ljava/lang/String;", "Ljava/lang/String;",
+                "Lcom/app/nobrokerhood/features/homepage/data/remote/models/Icon;",
+                "Ljava/lang/String;", "Z",
+                "Lkotlin/jvm/functions/Function0;", "Lkotlin/jvm/functions/Function0;",
+                "Li3/r;", "I", "I",
+            ),
+        ).matchSingle().method.returnEarly()
+    }
+}
+
+/**
+ * EXPERIMENTAL: Remove top-ad items at their actual TopAdState constructor.
+ *
+ * Earlier getter patches did not remove the top billboard. The home app-bar
+ * ViewModel makes TopAdState objects from TOP_AD/TOP_STATIC_AD responses.
+ * Constructor parameter p3 is the List field, verified by reading DEX field
+ * assignments; replacing it with an empty List ensures all subsequent
+ * holders of this model receive an empty advertising list.
+ *
+ * It is possible the surrounding layout reserves space or a different
+ * renderer supplies an independent billboard. Test on-device.
+ */
+@Suppress("unused")
+val clearTopAdStateAtConstructionPatch = bytecodePatch(
+    name = "NoBrokerHood: Clear top billboard at state creation (test)",
+    description = "Replace TopAdState's list with an empty list at construction.",
+    default = false,
+) {
+    compatibleWith(NOBROKERHOOD_3611)
+    execute {
+        Fingerprint(
+            definingClass =
+                "Lcom/app/nobrokerhood/features/homepage/data/remote/models/TopAdState;",
+            name = "<init>",
+            returnType = "V",
+            parameters = listOf(
+                "Z", "Z", "Ljava/util/List;", "Ljava/lang/Long;",
+                "Z", "Ljava/lang/String;", "Z",
+            ),
+        ).matchSingle().method.addInstructions(
+            0,
+            """
+            invoke-static {}, Ljava/util/Collections;->emptyList()Ljava/util/List;
+            move-result-object p3
+            """.trimIndent(),
+        )
+    }
+}
+
+/**
+ * EXPERIMENTAL: Hide the app-bar island horizontal banner list.
+ *
+ * Original 3.6.11 maps Lsh/s; to AppBarIsland.kt. Its F(...) method
+ * renders a horizontal list and is called by its Compose wrapper H(...).
+ * This MAY be responsible for the smaller Domino's promotional strip;
+ * code mapping alone cannot prove the visual association. The entire
+ * component will be hidden if enabled, so disable it if legitimate
+ * information disappears.
+ */
+@Suppress("unused")
+val hideAppBarIslandHorizontalListPatch = bytecodePatch(
+    name = "NoBrokerHood: Hide app-bar island row (test)",
+    description = "Skip the AppBarIsland.kt horizontal row. May hide non-ad items.",
+    default = false,
+) {
+    compatibleWith(NOBROKERHOOD_3611)
+    execute {
+        Fingerprint(
+            definingClass = "Lsh/s;",
+            name = "F",
+            returnType = "V",
+            parameters = listOf(
+                "Lg2/j1;", "Ljava/util/List;",
+                "Lkotlin/jvm/functions/Function1;",
+                "Lkotlin/jvm/functions/Function0;",
+                "Lc4/m;", "Lrh/b;", "Z", "Ljava/util/Set;", "Lb2/l3;",
+                "Ljava/lang/Boolean;", "Ljava/lang/Boolean;",
+                "Lkotlin/jvm/functions/Function0;", "Li3/r;", "I", "I", "I",
             ),
         ).matchSingle().method.returnEarly()
     }
