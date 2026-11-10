@@ -1,5 +1,16 @@
 package community.nobrokerhood
 
+/**
+ * v0.6 notes:
+ * - Preserves all TEN independent v0.5 patch definitions.
+ * - Adds ONE optional default-browser patch (11 total).
+ * - Does not alter notification channels.
+ * - Does NOT claim to eliminate duplicate approval notifications: original
+ *   code uses timestamp-based notification IDs. A safe event-ID dedup patch
+ *   needs confirmation of a stable approval/visit key and posting path.
+ * - Uncompiled Morphe patch source. Test on a spare setup or keep rollback.
+ */
+
 import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.AppTarget
@@ -255,5 +266,160 @@ val hideExpandedNotificationImagesPatch = bytecodePatch(
                 "Ljava/lang/String;",
             ),
         ).matchSingle().method.addInstructions(0, "const-string p3, \"\"")
+    }
+}
+
+
+/**
+ * EXPERIMENTAL: Suppress the fallback promotional card after approval.
+ *
+ * The original 7-patch build empties PostApprovalCardResponse.getTickets(),
+ * but DisplayEntryBannerFragment also consults getDefaultCard().
+ * Returning null is intended to remove that fallback. A caller that does
+ * not tolerate null may crash. Test ONLY this new patch first and retain
+ * the previous working patched APK for rollback.
+ */
+@Suppress("unused")
+val hidePostApprovalFallbackCardPatch = bytecodePatch(
+    name = "NoBrokerHood: Hide default post-approval card (experimental)",
+    description = "Hide the fallback ad card after entry approval. Null handling is untested.",
+    default = false,
+) {
+    compatibleWith(NOBROKERHOOD_3611)
+    execute {
+        Fingerprint(
+            definingClass =
+                "Lcom/app/nobrokerhood/newnobrokerhood/postApprovalCard/data/model/PostApprovalCardResponse;",
+            name = "getDefaultCard",
+            returnType =
+                "Lcom/app/nobrokerhood/newnobrokerhood/postApprovalCard/data/model/PostApprovalCardResponseData;",
+            parameters = emptyList(),
+        ).matchSingle().method.addInstructions(
+            0,
+            """
+            const/4 v0, 0x0
+            return-object v0
+            """.trimIndent(),
+        )
+    }
+}
+
+/**
+ * EXPERIMENTAL: Remove cards at the app-bar banner response boundary.
+ *
+ * The existing patch empties BannerState.getList(), but the app also has
+ * AppBarBannerResponseData.getCards(). The actual homepage screen has
+ * still displayed a top banner. Empty this upstream list as a separate
+ * hypothesis, not as a guaranteed fix. It may leave a blank container.
+ */
+@Suppress("unused")
+val hideAppBarResponseCardsPatch = bytecodePatch(
+    name = "NoBrokerHood: Hide app-bar response cards (experimental)",
+    description = "Remove app-bar advertising card data before creating banner state.",
+    default = false,
+) {
+    compatibleWith(NOBROKERHOOD_3611)
+    execute {
+        Fingerprint(
+            definingClass =
+                "Lcom/app/nobrokerhood/features/app_bar_banner/data/models/AppBarBannerResponseData;",
+            name = "getCards",
+            returnType = "Ljava/util/List;",
+            parameters = emptyList(),
+        ).matchSingle().method.addInstructions(
+            0,
+            """
+            invoke-static {}, Ljava/util/Collections;->emptyList()Ljava/util/List;
+            move-result-object v0
+            return-object v0
+            """.trimIndent(),
+        )
+    }
+}
+
+/**
+ * EXPERIMENTAL: Hide the home-discover carousel's cards.
+ *
+ * DiscoverData.getTickets() returns ArrayList, NOT List. We must return a
+ * real ArrayList so callers that expect an ArrayList do not class-cast.
+ * This may also hide non-ad promotional/discover items in that carousel.
+ */
+@Suppress("unused")
+val hideHomeDiscoverCarouselPatch = bytecodePatch(
+    name = "NoBrokerHood: Hide home-discover carousel (experimental)",
+    description = "Hide cards in the homepage discover carousel; may hide non-ad items too.",
+    default = false,
+) {
+    compatibleWith(NOBROKERHOOD_3611)
+    execute {
+        Fingerprint(
+            definingClass =
+                "Lcom/app/nobrokerhood/newnobrokerhood/home_native_discover_carousel/models/DiscoverData;",
+            name = "getTickets",
+            returnType = "Ljava/util/ArrayList;",
+            parameters = emptyList(),
+        ).matchSingle().method.addInstructions(
+            0,
+            """
+            new-instance v0, Ljava/util/ArrayList;
+            invoke-direct {v0}, Ljava/util/ArrayList;-><init>()V
+            return-object v0
+            """.trimIndent(),
+        )
+    }
+}
+
+
+/**
+ * EXPERIMENTAL (v0.6): Use the user's Android default browser for links
+ * previously routed through a Chrome-only utility.
+ *
+ * Verified in the uploaded 3.6.11 XAPK:
+ *   Lcom/app/nobrokerhood/utilities/t1;->R7(
+ *       Landroid/app/Activity;ILjava/lang/String;)V
+ * The original method checks for com.android.chrome and may display
+ * "Chrome is not installed." when Chrome is missing.
+ *
+ * This patch uses an IMPLICIT ACTION_VIEW intent. Android selects the user's
+ * configured default browser (or a compatible app/deep-link handler).
+ * It retains startActivityForResult and the original requestCode argument.
+ *
+ * Deliberately NOT enabled by default: if the app automatically tries to
+ * open an advertising URL, this redirects that attempt to the default
+ * browser rather than preventing the advertising launch. If no app can
+ * handle the URL, ActivityNotFoundException is possible. Test separately.
+ *
+ * Does not change notification delivery, approval actions, token handling,
+ * Android notification channels, or general browser integrations elsewhere.
+ */
+@Suppress("unused")
+val useDefaultBrowserInsteadOfChromePatch = bytecodePatch(
+    name = "NoBrokerHood: Use Android default browser (experimental)",
+    description = "Replace Chrome-only link opening with the system-selected browser; test links and notification launches.",
+    default = false,
+) {
+    compatibleWith(NOBROKERHOOD_3611)
+    execute {
+        Fingerprint(
+            definingClass = "Lcom/app/nobrokerhood/utilities/t1;",
+            name = "R7",
+            returnType = "V",
+            parameters = listOf(
+                "Landroid/app/Activity;", "I", "Ljava/lang/String;",
+            ),
+        ).matchSingle().method.addInstructions(
+            0,
+            """
+            new-instance v0, Landroid/content/Intent;
+            const-string v1, "android.intent.action.VIEW"
+            invoke-static {p3}, Landroid/net/Uri;->parse(Ljava/lang/String;)Landroid/net/Uri;
+            move-result-object v2
+            invoke-direct {v0, v1, v2}, Landroid/content/Intent;-><init>(Ljava/lang/String;Landroid/net/Uri;)V
+            const-string v1, "android.intent.category.BROWSABLE"
+            invoke-virtual {v0, v1}, Landroid/content/Intent;->addCategory(Ljava/lang/String;)Landroid/content/Intent;
+            invoke-virtual {p1, v0, p2}, Landroid/app/Activity;->startActivityForResult(Landroid/content/Intent;I)V
+            return-void
+            """.trimIndent(),
+        )
     }
 }
