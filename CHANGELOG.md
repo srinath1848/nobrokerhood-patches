@@ -1,3 +1,9 @@
+## [1.6.0](https://github.com/srinath1848/nobrokerhood-patches/compare/v1.5.0...v1.6.0) (2026-11-10)
+
+### ✨ New Features
+
+* test selective island-banner suppression ([513e9b9](https://github.com/srinath1848/nobrokerhood-patches/commit/513e9b9f6f8c159682dd9d1c39ea6234ef790334))
+
 ## [1.5.0](https://github.com/srinath1848/nobrokerhood-patches/compare/v1.4.0...v1.5.0) (2026-11-10)
 
 ### ✨ New Features

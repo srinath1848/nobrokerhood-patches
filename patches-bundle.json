@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-11-10T09:27:05",
-  "description": "## [1.5.0](https://github.com/srinath1848/nobrokerhood-patches/compare/v1.4.0...v1.5.0) (2026-11-10)\n\n### ✨ New Features\n\n* test accurate NoBrokerHood banner renderers ([a9bcac2](https://github.com/srinath1848/nobrokerhood-patches/commit/a9bcac227d32c364f2a6de3cec5a8bdd60e5ab4e))",
-  "download_url": "https://github.com/srinath1848/nobrokerhood-patches/releases/download/v1.5.0/patches-1.5.0.mpp",
+  "created_at": "2026-11-10T10:25:07",
+  "description": "## [1.6.0](https://github.com/srinath1848/nobrokerhood-patches/compare/v1.5.0...v1.6.0) (2026-11-10)\n\n### ✨ New Features\n\n* test selective island-banner suppression ([513e9b9](https://github.com/srinath1848/nobrokerhood-patches/commit/513e9b9f6f8c159682dd9d1c39ea6234ef790334))",
+  "download_url": "https://github.com/srinath1848/nobrokerhood-patches/releases/download/v1.6.0/patches-1.6.0.mpp",
   "signature_download_url": "",
-  "version": "1.5.0"
+  "version": "1.6.0"
 }
