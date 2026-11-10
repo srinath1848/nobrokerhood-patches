@@ -1,10 +1,64 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "patches": [
     {
       "name": "NoBrokerHood: Hide app-bar banners (experimental)",
       "description": "Empty app-bar banner entries; may leave a layout placeholder.",
+      "default": false,
+      "category": null,
+      "compatiblePackages": [
+        {
+          "packageName": "com.app.nobrokerhood",
+          "name": "NoBrokerHood",
+          "description": null,
+          "apkFileType": null,
+          "appIconColor": null,
+          "signatures": null,
+          "formFactor": "MOBILE",
+          "targets": [
+            {
+              "version": "3.6.11",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "NoBrokerHood: Hide app-bar response cards (experimental)",
+      "description": "Remove app-bar advertising card data before creating banner state.",
+      "default": false,
+      "category": null,
+      "compatiblePackages": [
+        {
+          "packageName": "com.app.nobrokerhood",
+          "name": "NoBrokerHood",
+          "description": null,
+          "apkFileType": null,
+          "appIconColor": null,
+          "signatures": null,
+          "formFactor": "MOBILE",
+          "targets": [
+            {
+              "version": "3.6.11",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "NoBrokerHood: Hide default post-approval card (experimental)",
+      "description": "Hide the fallback ad card after entry approval. Null handling is untested.",
       "default": false,
       "category": null,
       "compatiblePackages": [
@@ -60,6 +114,33 @@
       "name": "NoBrokerHood: Hide feed ad cards",
       "description": "Hide forum/home-feed ad cards (3.6.11).",
       "default": true,
+      "category": null,
+      "compatiblePackages": [
+        {
+          "packageName": "com.app.nobrokerhood",
+          "name": "NoBrokerHood",
+          "description": null,
+          "apkFileType": null,
+          "appIconColor": null,
+          "signatures": null,
+          "formFactor": "MOBILE",
+          "targets": [
+            {
+              "version": "3.6.11",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "NoBrokerHood: Hide home-discover carousel (experimental)",
+      "description": "Hide cards in the homepage discover carousel; may hide non-ad items too.",
+      "default": false,
       "category": null,
       "compatiblePackages": [
         {
@@ -168,6 +249,33 @@
       "name": "NoBrokerHood: Hide visitor-flow ads",
       "description": "Hide the visitor-flow promotional carousel (3.6.11).",
       "default": true,
+      "category": null,
+      "compatiblePackages": [
+        {
+          "packageName": "com.app.nobrokerhood",
+          "name": "NoBrokerHood",
+          "description": null,
+          "apkFileType": null,
+          "appIconColor": null,
+          "signatures": null,
+          "formFactor": "MOBILE",
+          "targets": [
+            {
+              "version": "3.6.11",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "NoBrokerHood: Use Android default browser (experimental)",
+      "description": "Replace Chrome-only link opening with the system-selected browser; test links and notification launches.",
+      "default": false,
       "category": null,
       "compatiblePackages": [
         {

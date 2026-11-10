@@ -1,3 +1,9 @@
+## [1.2.0](https://github.com/srinath1848/nobrokerhood-patches/compare/v1.1.0...v1.2.0) (2026-11-10)
+
+### ✨ New Features
+
+* add optional default browser handling for NoBrokerHood 3.6.11 ([8431092](https://github.com/srinath1848/nobrokerhood-patches/commit/8431092730918899f301fc39c4902ba0a529f24b))
+
 ## [1.1.0](https://github.com/srinath1848/nobrokerhood-patches/compare/v1.0.0...v1.1.0) (2026-11-09)
 
 ### ✨ New Features
