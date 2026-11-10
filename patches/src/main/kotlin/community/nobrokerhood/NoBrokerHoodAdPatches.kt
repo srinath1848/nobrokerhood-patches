@@ -1,18 +1,22 @@
 package community.nobrokerhood
 
 /**
- * v0.6 notes:
- * - Preserves all TEN independent v0.5 patch definitions.
- * - Adds ONE optional default-browser patch (11 total).
- * - Does not alter notification channels.
- * - Does NOT claim to eliminate duplicate approval notifications: original
- *   code uses timestamp-based notification IDs. A safe event-ID dedup patch
- *   needs confirmation of a stable approval/visit key and posting path.
- * - Uncompiled Morphe patch source. Test on a spare setup or keep rollback.
+ * NoBrokerHood 3.6.11 (versionCode 712) / community patch source v0.7.
+ *
+ * - Carries forward ten v0.5 patches.
+ * - Replaces the unsafe v0.6 unconditional default-browser redirect hook
+ *   with a narrowly filtered browser launch (known ad host blocked).
+ * - Adds an independent full-screen permission reminder suppression patch.
+ * - Adds an experimental floating-widget visibility patch.
+ * - Does not rewrite push delivery, channels, approval actions, or tokens.
+ * - Does not claim to selectively filter the mixed announcement carousel.
+ *
+ * These edits are NOT compiled or device tested in this environment.
  */
 
 import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
 import app.morphe.patcher.patch.AppTarget
 import app.morphe.patcher.patch.Compatibility
 import app.morphe.patcher.patch.bytecodePatch
@@ -371,31 +375,26 @@ val hideHomeDiscoverCarouselPatch = bytecodePatch(
 
 
 /**
- * EXPERIMENTAL (v0.6): Use the user's Android default browser for links
- * previously routed through a Chrome-only utility.
+ * EXPERIMENTAL (v0.7): Open ordinary links with the Android default browser,
+ * but refuse to launch URLs hosted on the observed advertising redirect
+ * domain (apps.multipl.in / multipl.in).
  *
- * Verified in the uploaded 3.6.11 XAPK:
- *   Lcom/app/nobrokerhood/utilities/t1;->R7(
- *       Landroid/app/Activity;ILjava/lang/String;)V
- * The original method checks for com.android.chrome and may display
- * "Chrome is not installed." when Chrome is missing.
+ * This deliberately replaces the v0.6 catch-all ACTION_VIEW hook, which
+ * opened the promotional link when the notification was tapped.
  *
- * This patch uses an IMPLICIT ACTION_VIEW intent. Android selects the user's
- * configured default browser (or a compatible app/deep-link handler).
- * It retains startActivityForResult and the original requestCode argument.
+ * IMPORTANT: this is a *known-host filter*, not a comprehensive ad blocker.
+ * The server can change campaign hosts. It does not rewrite PendingIntents,
+ * visitor approvals, FCM registration, or notification delivery.
  *
- * Deliberately NOT enabled by default: if the app automatically tries to
- * open an advertising URL, this redirects that attempt to the default
- * browser rather than preventing the advertising launch. If no app can
- * handle the URL, ActivityNotFoundException is possible. Test separately.
- *
- * Does not change notification delivery, approval actions, token handling,
- * Android notification channels, or general browser integrations elsewhere.
+ * Original 3.6.11 signature:
+ *   Lcom/app/nobrokerhood/utilities/t1;->R7(Activity, int, String): void
+ * Method has 4 free local registers (v0..v3), so the injected code uses
+ * v0..v2 only and preserves p1/p2/p3.
  */
 @Suppress("unused")
 val useDefaultBrowserInsteadOfChromePatch = bytecodePatch(
-    name = "NoBrokerHood: Use Android default browser (experimental)",
-    description = "Replace Chrome-only link opening with the system-selected browser; test links and notification launches.",
+    name = "NoBrokerHood: Default browser, block known ad hosts (experimental)",
+    description = "Use Android browser for genuine links; block known Multipl redirect hosts.",
     default = false,
 ) {
     compatibleWith(NOBROKERHOOD_3611)
@@ -404,12 +403,23 @@ val useDefaultBrowserInsteadOfChromePatch = bytecodePatch(
             definingClass = "Lcom/app/nobrokerhood/utilities/t1;",
             name = "R7",
             returnType = "V",
-            parameters = listOf(
-                "Landroid/app/Activity;", "I", "Ljava/lang/String;",
-            ),
-        ).matchSingle().method.addInstructions(
+            parameters = listOf("Landroid/app/Activity;", "I", "Ljava/lang/String;"),
+        ).matchSingle().method.addInstructionsWithLabels(
             0,
             """
+            if-eqz p3, :blocked
+            invoke-static {p3}, Landroid/net/Uri;->parse(Ljava/lang/String;)Landroid/net/Uri;
+            move-result-object v2
+            invoke-virtual {v2}, Landroid/net/Uri;->getHost()Ljava/lang/String;
+            move-result-object v2
+            const-string v0, "apps.multipl.in"
+            invoke-virtual {v0, v2}, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
+            move-result v0
+            if-nez v0, :blocked
+            const-string v0, "multipl.in"
+            invoke-virtual {v0, v2}, Ljava/lang/String;->equalsIgnoreCase(Ljava/lang/String;)Z
+            move-result v0
+            if-nez v0, :blocked
             new-instance v0, Landroid/content/Intent;
             const-string v1, "android.intent.action.VIEW"
             invoke-static {p3}, Landroid/net/Uri;->parse(Ljava/lang/String;)Landroid/net/Uri;
@@ -419,7 +429,58 @@ val useDefaultBrowserInsteadOfChromePatch = bytecodePatch(
             invoke-virtual {v0, v1}, Landroid/content/Intent;->addCategory(Ljava/lang/String;)Landroid/content/Intent;
             invoke-virtual {p1, v0, p2}, Landroid/app/Activity;->startActivityForResult(Landroid/content/Intent;I)V
             return-void
+            :blocked
+            return-void
             """.trimIndent(),
         )
+    }
+}
+
+/**
+ * v0.7: Suppress the HOME-screen re-prompt asking to enable full-screen
+ * visitor alerts. The call site HomeActivity.m8() solely creates and shows
+ * FullScreenPermissionDialog using the tag FullScreenPermissionSheetDialog.
+ *
+ * Suppressing this method does NOT grant/revoke notification permission,
+ * change user preferences, or stop regular visitor notifications.
+ */
+@Suppress("unused")
+val suppressFullscreenReminderPatch = bytecodePatch(
+    name = "NoBrokerHood: Stop full-screen permission nag",
+    description = "Stop the home-screen full-screen alert reminder without changing permissions.",
+    default = false,
+) {
+    compatibleWith(NOBROKERHOOD_3611)
+    execute {
+        Fingerprint(
+            definingClass = "Lcom/app/nobrokerhood/activities/HomeActivity;",
+            name = "m8",
+            returnType = "V",
+            parameters = emptyList(),
+        ).matchSingle().method.returnEarly()
+    }
+}
+
+/**
+ * EXPERIMENTAL: HomeActivity.c8() checks HomeFloatingModel.getIsEnabled()
+ * and returns whether a home floating widget may be shown.
+ *
+ * This might control the Philips/iPhone floating campaign sidebar. It may
+ * also hide other floating shortcuts. It has NOT been visually confirmed.
+ */
+@Suppress("unused")
+val suppressFloatingCampaignWidgetPatch = bytecodePatch(
+    name = "NoBrokerHood: Hide home floating widget (experimental)",
+    description = "Disable a home floating-widget visibility gate. Could hide unrelated shortcuts.",
+    default = false,
+) {
+    compatibleWith(NOBROKERHOOD_3611)
+    execute {
+        Fingerprint(
+            definingClass = "Lcom/app/nobrokerhood/activities/HomeActivity;",
+            name = "c8",
+            returnType = "Z",
+            parameters = emptyList(),
+        ).matchSingle().method.returnEarly(false)
     }
 }
