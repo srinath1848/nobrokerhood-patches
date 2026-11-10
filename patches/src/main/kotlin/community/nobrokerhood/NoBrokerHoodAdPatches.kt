@@ -1,13 +1,13 @@
 package community.nobrokerhood
 
 /**
- * NoBrokerHood 3.6.11 (versionCode 712) / community patch source v0.7.
+ * NoBrokerHood 3.6.11 (versionCode 712) / community patch source v0.8 (sidebar experiment).
  *
  * - Carries forward ten v0.5 patches.
  * - Replaces the unsafe v0.6 unconditional default-browser redirect hook
  *   with a narrowly filtered browser launch (known ad host blocked).
  * - Adds an independent full-screen permission reminder suppression patch.
- * - Adds an experimental floating-widget visibility patch.
+ * - Replaces the ineffective admin FAB hook with targeted promotional card suppression.
  * - Does not rewrite push delivery, channels, approval actions, or tokens.
  * - Does not claim to selectively filter the mixed announcement carousel.
  *
@@ -462,25 +462,32 @@ val suppressFullscreenReminderPatch = bytecodePatch(
 }
 
 /**
- * EXPERIMENTAL: HomeActivity.c8() checks HomeFloatingModel.getIsEnabled()
- * and returns whether a home floating widget may be shown.
+ * EXPERIMENTAL (v0.8): Remove draggable promotional picture-in-picture
+ * card, likely responsible for the Philips/iPhone/Malabar side tab.
  *
- * This might control the Philips/iPhone floating campaign sidebar. It may
- * also hide other floating shortcuts. It has NOT been visually confirmed.
+ * This is NOT HomeActivity.c8 (which gates the admin floating button).
+ * The app's base activity ya.showMultimediaCard(PromotionData) inflates
+ * multimediaCardView and sets up a draggable sponsored visual.
+ *
+ * This hook only skips building that promotional card. It does not alter
+ * notifications, visitor approvals, homepage top banners or legitimate
+ * browser links. Actual sidebar removal remains a device-test hypothesis.
  */
 @Suppress("unused")
 val suppressFloatingCampaignWidgetPatch = bytecodePatch(
-    name = "NoBrokerHood: Hide home floating widget (experimental)",
-    description = "Disable a home floating-widget visibility gate. Could hide unrelated shortcuts.",
+    name = "NoBrokerHood: Hide promotional side tab (experimental)",
+    description = "Suppress the draggable multimedia promotion card; verify on-device.",
     default = false,
 ) {
     compatibleWith(NOBROKERHOOD_3611)
     execute {
         Fingerprint(
-            definingClass = "Lcom/app/nobrokerhood/activities/HomeActivity;",
-            name = "c8",
-            returnType = "Z",
-            parameters = emptyList(),
-        ).matchSingle().method.returnEarly(false)
+            definingClass = "Lcom/app/nobrokerhood/activities/ya;",
+            name = "showMultimediaCard",
+            returnType = "V",
+            parameters = listOf(
+                "Lcom/app/nobrokerhood/newnobrokerhood/promotions/data/PromotionData;",
+            ),
+        ).matchSingle().method.returnEarly()
     }
 }
