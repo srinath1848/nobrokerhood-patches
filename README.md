@@ -19,9 +19,9 @@ Click the button below, or manually add this repo url to Morphe Manager: https:/
 ## 🩹 Patches list
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.6.0](https://github.com/srinath1848/nobrokerhood-patches/releases/tag/v1.6.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;17 patches total
+> **[v1.6.1](https://github.com/srinath1848/nobrokerhood-patches/releases/tag/v1.6.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;18 patches total
 <details open>
-<summary>📦 NoBrokerHood&nbsp;&nbsp;•&nbsp;&nbsp;17 patches</summary>
+<summary>📦 NoBrokerHood&nbsp;&nbsp;•&nbsp;&nbsp;18 patches</summary>
 <br>
 
 **Package name:** `com.app.nobrokerhood`
@@ -46,6 +46,7 @@ Click the button below, or manually add this repo url to Morphe Manager: https:/
 | [NoBrokerHood: Hide homepage top ads (experimental)](#nobrokerhood-hide-homepage-top-ads-experimental) | Supply an empty top-ad list and disable its loading/expanded state. |  |
 | [NoBrokerHood: Hide island promotional strip (experimental)](#nobrokerhood-hide-island-promotional-strip-experimental) | Hide homepage items marked ISLAND_BANNER; test against the blue Domino's strip. |  |
 | [NoBrokerHood: Hide post-approval ad card (experimental)](#nobrokerhood-hide-post-approval-ad-card-experimental) | Hide the sponsored card shown after entry approval or pre-approval (3.6.11). |  |
+| [NoBrokerHood: Hide post-approval multimedia ads](#nobrokerhood-hide-post-approval-multimedia-ads) | Suppress image, GIF, video and Lottie ad cards after approval, without blocking the approval status. |  |
 | [NoBrokerHood: Hide promotional popups](#nobrokerhood-hide-promotional-popups) | Suppress app-level marketing dialogs (3.6.11). |  |
 | [NoBrokerHood: Hide promotional side tab (experimental)](#nobrokerhood-hide-promotional-side-tab-experimental) | Suppress the draggable multimedia promotion card; verify on-device. |  |
 | [NoBrokerHood: Hide visitor-flow ads](#nobrokerhood-hide-visitor-flow-ads) | Hide the visitor-flow promotional carousel (3.6.11). |  |

@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "patches": [
     {
       "name": "NoBrokerHood: Default browser, block known ad hosts (experimental)",
@@ -329,6 +329,33 @@
     {
       "name": "NoBrokerHood: Hide post-approval ad card (experimental)",
       "description": "Hide the sponsored card shown after entry approval or pre-approval (3.6.11).",
+      "default": false,
+      "category": null,
+      "compatiblePackages": [
+        {
+          "packageName": "com.app.nobrokerhood",
+          "name": "NoBrokerHood",
+          "description": null,
+          "apkFileType": null,
+          "appIconColor": null,
+          "signatures": null,
+          "formFactor": "MOBILE",
+          "targets": [
+            {
+              "version": "3.6.11",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "NoBrokerHood: Hide post-approval multimedia ads",
+      "description": "Suppress image, GIF, video and Lottie ad cards after approval, without blocking the approval status.",
       "default": false,
       "category": null,
       "compatiblePackages": [

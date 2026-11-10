@@ -1,3 +1,9 @@
+## [1.6.1](https://github.com/srinath1848/nobrokerhood-patches/compare/v1.6.0...v1.6.1) (2026-11-10)
+
+### 🐛 Bug Fixes
+
+* suppress post-approval multimedia cards ([a9912ea](https://github.com/srinath1848/nobrokerhood-patches/commit/a9912ea6136f0c7bfd5d7fe0eb40befabb67b7bb))
+
 ## [1.6.0](https://github.com/srinath1848/nobrokerhood-patches/compare/v1.5.0...v1.6.0) (2026-11-10)
 
 ### ✨ New Features
