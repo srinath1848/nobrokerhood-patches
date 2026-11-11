@@ -1,7 +1,7 @@
 package community.nobrokerhood
 
 /**
- * NoBrokerHood 3.6.11 (versionCode 712) / 19-patch candidate retaining the earlier 18-patch source.
+ * NoBrokerHood 3.6.11 (versionCode 712) / 20-patch experimental candidate built on the earlier 19-patch source.
  *
  * - Carries forward ten v0.5 patches.
  * - Replaces the unsafe v0.6 unconditional default-browser redirect hook
@@ -709,6 +709,41 @@ val hidePostApprovalMultimediaCardsPatch = bytecodePatch(
 }
 
 
+
+/**
+ * EXPERIMENTAL: Prevent creation of the ad-only RecyclerView in the
+ * post-approval confirmation fragment.
+ *
+ * Source APK verification (3.6.11, classes6.dex):
+ * - DisplayEntryBannerFragment.setData() creates the green approval status.
+ * - DisplayEntryBannerFragment.onCallBack() calls initRecyclerView().
+ * - initRecyclerView() constructs adapters/n0 (BannerListAdapter) and binds
+ *   it to RecyclerView for the picture/video/Lottie ad content.
+ *
+ * This is independent of the earlier adapter-count patch. It avoids creating
+ * the promotional adapter at all. It does NOT modify setData(), approval
+ * handling, Firebase reception, nor the close button.
+ *
+ * It may leave blank vertical space and may change media-completion timing;
+ * test this switch independently first, with old post-approval patches OFF.
+ */
+@Suppress("unused")
+val hidePostApprovalAdContainerPatch = bytecodePatch(
+    name = "NoBrokerHood: Skip post-approval ad container (experimental)",
+    description = "Do not initialize the image/video ad RecyclerView after entry approval; preserve approval details.",
+    default = false,
+) {
+    compatibleWith(NOBROKERHOOD_3611)
+    execute {
+        Fingerprint(
+            definingClass = "Lcom/app/nobrokerhood/fragments/DisplayEntryBannerFragment;",
+            name = "initRecyclerView",
+            returnType = "V",
+            parameters = emptyList(),
+        ).matchSingle().method.returnEarly()
+    }
+}
+
 /**
  * Experimental: disarm promotional browser deeplinks carried by push
  * notification intents BEFORE the app parses and forwards those links.
@@ -721,8 +756,9 @@ val hidePostApprovalMultimediaCardsPatch = bytecodePatch(
  * - Browser launch can follow a notification tap even if its content describes
  *   a legitimate visitor entry or exit.
  *
- * This guard ONLY modifies an intent already marked as a notification
- * (uniqueCode present) AND asking to open a browser route/URL.  It does not
+ * This guard only touches an intent carrying a notification marker
+ * (uniqueCode or messageType). It drops gaClick; clears hybridUrl on
+ * CHECK_IN/CHECK_OUT; and clears browser-directed extras when found. It does not
  * suppress the notification, alter the approval request, change Firebase
  * registration, touch Android channels, or block manually opened URLs.
  *
@@ -738,7 +774,7 @@ val hidePostApprovalMultimediaCardsPatch = bytecodePatch(
 @Suppress("unused")
 val stopNotificationPromoBrowserRedirectPatch = bytecodePatch(
     name = "NoBrokerHood: Stop promotional browser launches from notifications",
-    description = "Prevent notification-triggered browser ad routes; retain security alerts and in-app event metadata (experimental).",
+    description = "Clear advertising click metadata and browser-directed routes from notification intents, preserving security-event fields (experimental).",
     default = false,
 ) {
     compatibleWith(NOBROKERHOOD_3611)
@@ -758,7 +794,29 @@ val stopNotificationPromoBrowserRedirectPatch = bytecodePatch(
             const-string v1, "uniqueCode"
             invoke-virtual {v0, v1}, Landroid/content/Intent;->hasExtra(Ljava/lang/String;)Z
             move-result v1
+            if-nez v1, :nbhRecognizedNotification
+            const-string v1, "messageType"
+            invoke-virtual {v0, v1}, Landroid/content/Intent;->hasExtra(Ljava/lang/String;)Z
+            move-result v1
             if-eqz v1, :nbhNotificationRouteDone
+            :nbhRecognizedNotification
+            const-string v1, "gaClick"
+            invoke-virtual {v0, v1}, Landroid/content/Intent;->removeExtra(Ljava/lang/String;)V
+            const-string v1, "screenName"
+            invoke-virtual {v0, v1}, Landroid/content/Intent;->getStringExtra(Ljava/lang/String;)Ljava/lang/String;
+            move-result-object v2
+            const-string v3, "CHECK_IN"
+            invoke-virtual {v3, v2}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+            move-result v3
+            if-nez v3, :nbhDropHybridUrl
+            const-string v3, "CHECK_OUT"
+            invoke-virtual {v3, v2}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+            move-result v3
+            if-eqz v3, :nbhCheckRoute
+            :nbhDropHybridUrl
+            const-string v1, "hybridUrl"
+            invoke-virtual {v0, v1}, Landroid/content/Intent;->removeExtra(Ljava/lang/String;)V
+            :nbhCheckRoute
             const-string v1, "destination_route"
             invoke-virtual {v0, v1}, Landroid/content/Intent;->getStringExtra(Ljava/lang/String;)Ljava/lang/String;
             move-result-object v2
@@ -788,6 +846,10 @@ val stopNotificationPromoBrowserRedirectPatch = bytecodePatch(
             const-string v1, "deeplink"
             invoke-virtual {v0, v1}, Landroid/content/Intent;->removeExtra(Ljava/lang/String;)V
             const-string v1, "url"
+            invoke-virtual {v0, v1}, Landroid/content/Intent;->removeExtra(Ljava/lang/String;)V
+            const-string v1, "hybridUrl"
+            invoke-virtual {v0, v1}, Landroid/content/Intent;->removeExtra(Ljava/lang/String;)V
+            const-string v1, "target_url"
             invoke-virtual {v0, v1}, Landroid/content/Intent;->removeExtra(Ljava/lang/String;)V
             const/4 v1, 0x0
             invoke-virtual {v0, v1}, Landroid/content/Intent;->setData(Landroid/net/Uri;)Landroid/content/Intent;
