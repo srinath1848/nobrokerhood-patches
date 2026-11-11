@@ -19,9 +19,9 @@ Click the button below, or manually add this repo url to Morphe Manager: https:/
 ## 🩹 Patches list
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.7.0](https://github.com/srinath1848/nobrokerhood-patches/releases/tag/v1.7.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;19 patches total
+> **[v1.8.0](https://github.com/srinath1848/nobrokerhood-patches/releases/tag/v1.8.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;20 patches total
 <details open>
-<summary>📦 NoBrokerHood&nbsp;&nbsp;•&nbsp;&nbsp;19 patches</summary>
+<summary>📦 NoBrokerHood&nbsp;&nbsp;•&nbsp;&nbsp;20 patches</summary>
 <br>
 
 **Package name:** `com.app.nobrokerhood`
@@ -50,8 +50,9 @@ Click the button below, or manually add this repo url to Morphe Manager: https:/
 | [NoBrokerHood: Hide promotional popups](#nobrokerhood-hide-promotional-popups) | Suppress app-level marketing dialogs (3.6.11). |  |
 | [NoBrokerHood: Hide promotional side tab (experimental)](#nobrokerhood-hide-promotional-side-tab-experimental) | Suppress the draggable multimedia promotion card; verify on-device. |  |
 | [NoBrokerHood: Hide visitor-flow ads](#nobrokerhood-hide-visitor-flow-ads) | Hide the visitor-flow promotional carousel (3.6.11). |  |
+| [NoBrokerHood: Skip post-approval ad container (experimental)](#nobrokerhood-skip-post-approval-ad-container-experimental) | Do not initialize the image/video ad RecyclerView after entry approval; preserve approval details. |  |
 | [NoBrokerHood: Stop full-screen permission nag](#nobrokerhood-stop-full-screen-permission-nag) | Stop the home-screen full-screen alert reminder without changing permissions. |  |
-| [NoBrokerHood: Stop promotional browser launches from notifications](#nobrokerhood-stop-promotional-browser-launches-from-notifications) | Prevent notification-triggered browser ad routes; retain security alerts and in-app event metadata (experimental). |  |
+| [NoBrokerHood: Stop promotional browser launches from notifications](#nobrokerhood-stop-promotional-browser-launches-from-notifications) | Clear advertising click metadata and browser-directed routes from notification intents, preserving security-event fields (experimental). |  |
 
 </details>
 
